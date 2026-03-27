@@ -1,5 +1,5 @@
 import { useLocation, Link } from 'react-router-dom'
-import { Sun, Moon, Plus, Download } from 'lucide-react'
+import { Sun, Moon, Plus, Download ,View} from 'lucide-react'
 import { useTheme } from '../../context/ThemeContext'
 import { format } from 'date-fns'
 import api from '../../utils/api'
@@ -39,13 +39,13 @@ export default function TopBar() {
       </div>
 
       <div className="flex items-center gap-2">
-        {pathname === '/expenses' && (
+        {/* {pathname === '/expenses' && (
           <button onClick={handleExport} className="btn-secondary hidden sm:flex">
             <Download size={15} /> Export CSV
           </button>
-        )}
+        )} */}
         <Link to="/expenses" className="btn-primary hidden sm:flex">
-          <Plus size={15} /> Add Expense
+          <View size={15} />View All Expenses
         </Link>
         <button onClick={toggle} className="btn-ghost p-2 rounded-xl" aria-label="Toggle theme">
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}

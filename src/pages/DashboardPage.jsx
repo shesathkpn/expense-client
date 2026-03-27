@@ -43,6 +43,7 @@ export default function DashboardPage() {
           Hey, {user?.name?.split(' ')[0]} 👋
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Here's your spending overview</p>
+
       </div>
 
       {/* Budget Alert */}
