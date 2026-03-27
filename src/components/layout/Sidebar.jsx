@@ -1,10 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Receipt, BarChart3,
-  Settings, LogOut, TrendingUp, Menu, X,
+  Settings, LogOut, TrendingUp, Menu, X, Sun, Moon,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { useTheme } from '../../context/ThemeContext'
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -87,6 +88,7 @@ function NavContent({ onClose, hideLogo = false }) {
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false)
+  const { theme, toggle } = useTheme()
 
   return (
     <>
@@ -100,13 +102,22 @@ export default function Sidebar() {
           <span className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">Xpensio</span>
         </div>
 
-        {/* Toggle button */}
-        <button
-          className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* Theme toggle and menu toggle buttons */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={toggle}
+            className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <button
+            className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile overlay */}
