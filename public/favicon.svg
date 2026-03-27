@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="50" fill="url(#grad)"/>
+  
+  <!-- Wallet/card shape -->
+  <rect x="25" y="35" width="50" height="30" rx="4" fill="white" opacity="0.95"/>
+  
+  <!-- Card chip -->
+  <rect x="30" y="40" width="8" height="8" rx="1" fill="#0ea5e9" opacity="0.7"/>
+  
+  <!-- Dollar sign -->
+  <text x="50" y="62" font-size="28" font-weight="bold" fill="#0ea5e9" text-anchor="middle" font-family="Arial, sans-serif">$</text>
+</svg>
