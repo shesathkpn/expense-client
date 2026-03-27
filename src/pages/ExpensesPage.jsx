@@ -5,6 +5,8 @@ import {
 } from 'lucide-react'
 import { useExpenses } from '../hooks'
 import ExpenseModal from '../components/expenses/ExpenseModal'
+import DeleteModal from '../components/expenses/DeleteModal'
+import FloatingAddButton from '../components/ui/FloatingAddButton'
 import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ICONS } from '../types'
 import { formatCurrency, formatDate } from '../utils/helpers'
 import { format } from 'date-fns'
@@ -20,7 +22,9 @@ export default function ExpensesPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
-  const [deletingId, setDeletingId] = useState(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [expenseToDelete, setExpenseToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const filters = {
     page, limit: 15,
@@ -49,10 +53,20 @@ export default function ExpensesPage() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this expense?')) return
-    setDeletingId(id)
-    await remove(id)
-    setDeletingId(null)
+    const expense = expenses.find(e => e._id === id)
+    if (expense) {
+      setExpenseToDelete(expense)
+      setDeleteModalOpen(true)
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!expenseToDelete) return
+    setIsDeleting(true)
+    await remove(expenseToDelete._id)
+    setIsDeleting(false)
+    setDeleteModalOpen(false)
+    setExpenseToDelete(null)
   }
 
   const handleExport = async () => {
@@ -176,8 +190,8 @@ export default function ExpensesPage() {
                           <button onClick={() => { setEditingExpense(exp); setModalOpen(true) }} className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                             <Pencil size={14} />
                           </button>
-                          <button onClick={() => handleDelete(exp._id)} disabled={deletingId === exp._id} className="p-1.5 hover:bg-red-100 dark:hover:bg-red-950/50 rounded-lg text-gray-400 hover:text-red-500 transition-colors">
-                            {deletingId === exp._id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                          <button onClick={() => handleDelete(exp._id)} className="p-1.5 hover:bg-red-100 dark:hover:bg-red-950/50 rounded-lg text-gray-400 hover:text-red-500 transition-colors">
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </td>
@@ -227,6 +241,20 @@ export default function ExpensesPage() {
         onSubmit={editingExpense ? handleUpdate : handleCreate}
         expense={editingExpense}
       />
+
+      <DeleteModal
+        open={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false)
+          setExpenseToDelete(null)
+        }}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title={expenseToDelete?.title}
+        amount={expenseToDelete?.amount}
+      />
+
+      <FloatingAddButton onClick={() => { setEditingExpense(null); setModalOpen(true) }} label="Add Expense" />
     </div>
   )
 }

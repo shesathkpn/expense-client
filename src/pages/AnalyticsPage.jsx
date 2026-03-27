@@ -8,6 +8,9 @@ import { CATEGORY_COLORS, CATEGORY_ICONS } from '../types'
 import { formatCurrency, formatDate } from '../utils/helpers'
 import { BarChart3, TrendingUp, TrendingDown, PieChart as PieIcon, AlertTriangle } from 'lucide-react'
 import Spinner from '../components/ui/Spinner'
+import FloatingAddButton from '../components/ui/FloatingAddButton'
+import ExpenseModal from '../components/expenses/ExpenseModal'
+import { useExpenses } from '../hooks'
 
 const PERIODS = [
   { value: 'day', label: 'Daily (30d)' },
@@ -27,7 +30,9 @@ function CustomTooltip({ active, payload, label }) {
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState('month')
-  const { data, loading, error } = useAnalytics(period)
+  const [modalOpen, setModalOpen] = useState(false)
+  const { data, loading, error, refetch } = useAnalytics(period)
+  const { create } = useExpenses({ page: 1, limit: 10 })
 
   if (loading) return <div className="flex items-center justify-center h-64"><Spinner size={28} /></div>
   if (error || !data) return (
@@ -181,6 +186,21 @@ export default function AnalyticsPage() {
           </div>
         </div>
       )}
+
+      <FloatingAddButton onClick={() => setModalOpen(true)} label="Add Expense" />
+
+      <ExpenseModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={async (data) => {
+          const result = await create(data)
+          if (result.success) {
+            await refetch()
+          }
+          return result
+        }}
+        expense={null}
+      />
     </div>
   )
 }

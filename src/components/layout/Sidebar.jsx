@@ -13,7 +13,7 @@ const navItems = [
   { to: '/settings',  icon: Settings,         label: 'Settings'  },
 ]
 
-function NavContent({ onClose }) {
+function NavContent({ onClose, hideLogo = false }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -24,16 +24,18 @@ function NavContent({ onClose }) {
 
   return (
     <>
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-gray-100 dark:border-gray-800">
-        <div className="w-9 h-9 bg-sky-500 rounded-xl flex items-center justify-center shadow-sm shadow-sky-500/30 flex-shrink-0">
-          <TrendingUp size={18} className="text-white" />
+      {/* Logo - hidden on mobile */}
+      {!hideLogo && (
+        <div className="flex items-center gap-3 px-4 py-5 border-b border-gray-100 dark:border-gray-800">
+          <div className="w-9 h-9 bg-sky-500 rounded-xl flex items-center justify-center shadow-sm shadow-sky-500/30 flex-shrink-0">
+            <TrendingUp size={18} className="text-white" />
+          </div>
+          <div>
+            <span className="font-bold text-gray-900 dark:text-white text-base tracking-tight">Xpensio</span>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-none mt-0.5">Expense Tracker</p>
+          </div>
         </div>
-        <div>
-          <span className="font-bold text-gray-900 dark:text-white text-base tracking-tight">Xpensio</span>
-          <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-none mt-0.5">Expense Tracker</p>
-        </div>
-      </div>
+      )}
 
       {/* Nav links */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -88,22 +90,33 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile toggle */}
-      <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-100 dark:border-gray-800"
-        onClick={() => setOpen(!open)}
-      >
-        {open ? <X size={18} /> : <Menu size={18} />}
-      </button>
+      {/* Mobile header with logo and toggle */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 z-40 shadow-sm">
+        {/* Logo */}
+        <div className="flex items-center gap-2 flex-1">
+          <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center shadow-sm shadow-sky-500/30 flex-shrink-0">
+            <TrendingUp size={16} className="text-white" />
+          </div>
+          <span className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">Xpensio</span>
+        </div>
+
+        {/* Toggle button */}
+        <button
+          className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
 
       {/* Mobile overlay */}
       {open && (
-        <div className="lg:hidden fixed inset-0 bg-black/40 z-30" onClick={() => setOpen(false)} />
+        <div className="lg:hidden fixed inset-0 bg-black/40 z-30 top-16" onClick={() => setOpen(false)} />
       )}
 
       {/* Mobile sidebar */}
-      <aside className={`lg:hidden fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col transition-transform duration-200 shadow-xl ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-        <NavContent onClose={() => setOpen(false)} />
+      <aside className={`lg:hidden fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col transition-transform duration-200 shadow-xl top-16 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
+        <NavContent onClose={() => setOpen(false)} hideLogo={true} />
       </aside>
 
       {/* Desktop sidebar */}

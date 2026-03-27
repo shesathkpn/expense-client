@@ -1,12 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Save, Loader2, User, Bell } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { formatCurrency } from '../utils/helpers'
 import toast from 'react-hot-toast'
+import FloatingAddButton from '../components/ui/FloatingAddButton'
+import ExpenseModal from '../components/expenses/ExpenseModal'
+import { useExpenses } from '../hooks'
 
 export default function SettingsPage() {
+  const [modalOpen, setModalOpen] = useState(false)
   const { user, updateProfile, loading } = useAuth()
+  const { create } = useExpenses({ page: 1, limit: 10 })
 
   const { register: regProfile, handleSubmit: handleProfile, reset: resetProfile, formState: { isSubmitting: savingProfile } } = useForm()
   const { register: regBudget, handleSubmit: handleBudget, reset: resetBudget, formState: { isSubmitting: savingBudget } } = useForm()
@@ -101,6 +106,18 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      <FloatingAddButton onClick={() => setModalOpen(true)} label="Add Expense" />
+
+      <ExpenseModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={async (data) => {
+          const result = await create(data)
+          return result
+        }}
+        expense={null}
+      />
     </div>
   )
 }

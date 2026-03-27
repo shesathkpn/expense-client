@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Calendar, CalendarDays, Wallet,
@@ -8,6 +9,9 @@ import { useAuth } from '../context/AuthContext'
 import { formatCurrency, formatDate } from '../utils/helpers'
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '../types'
 import Spinner from '../components/ui/Spinner'
+import FloatingAddButton from '../components/ui/FloatingAddButton'
+import ExpenseModal from '../components/expenses/ExpenseModal'
+import { useExpenses } from '../hooks'
 
 function StatCard({ label, value, icon, color }) {
   return (
@@ -20,8 +24,10 @@ function StatCard({ label, value, icon, color }) {
 }
 
 export default function DashboardPage() {
+  const [modalOpen, setModalOpen] = useState(false)
   const { user } = useAuth()
-  const { stats, loading, error } = useDashboard()
+  const { stats, loading, error, refetch } = useDashboard()
+  const { create } = useExpenses({ page: 1, limit: 10 })
 
   if (loading) return <div className="flex items-center justify-center h-64"><Spinner size={28} /></div>
 
@@ -167,12 +173,31 @@ export default function DashboardPage() {
           <div>
             <h3 className="font-semibold text-white">Deep dive into analytics</h3>
             <p className="text-sm text-sky-100 mt-0.5">Charts, trends and spending patterns</p>
-          </div>
-          <Link to="/analytics" className="flex items-center gap-2 bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-xl text-sm font-medium text-white backdrop-blur-sm">
+             <Link to="/analytics" className="flex items-center justify-center gap-2 mt-2 bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-xl text-sm font-medium text-white backdrop-blur-sm">
             View <TrendingUp size={15} />
           </Link>
+          </div>
+         
         </div>
       </div>
+
+      {/* Floating Add Button */}
+      <FloatingAddButton onClick={() => setModalOpen(true)} label="Add Expense" />
+
+      {/* Expense Modal */}
+      <ExpenseModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={async (data) => {
+          const result = await create(data)
+          if (result.success) {
+            // Refetch dashboard stats to update immediately
+            await refetch()
+          }
+          return result
+        }}
+        expense={null}
+      />
     </div>
   )
 }
