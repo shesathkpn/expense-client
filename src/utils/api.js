@@ -24,6 +24,7 @@ api.interceptors.response.use(
   async err => {
     const original = err.config
 
+    // Handle token expiration with refresh attempt
     if (
       err.response?.status === 401 &&
       err.response?.data?.code === 'TOKEN_EXPIRED' &&
@@ -51,6 +52,11 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false
       }
+    }
+
+    // Redirect to login on other 401 errors
+    if (err.response?.status === 401 && original.url !== '/auth/login' && original.url !== '/auth/signup') {
+      window.location.href = '/login'
     }
 
     return Promise.reject(err)

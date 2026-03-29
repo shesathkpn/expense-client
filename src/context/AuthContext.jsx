@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+  const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -41,6 +43,7 @@ export function AuthProvider({ children }) {
     } catch { /* ignore */ }
     setUser(null)
     toast.success('Logged out successfully')
+    navigate('/login', { replace: true })
   }
 
   const updateProfile = async (updates) => {
