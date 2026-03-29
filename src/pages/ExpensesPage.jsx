@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import {
   Plus, Search, Filter, Trash2, Pencil,
   ChevronLeft, ChevronRight, RefreshCw, Download, Loader2,
+  ArrowUp, ArrowDown,
 } from 'lucide-react'
 import { useExpenses } from '../hooks'
 import ExpenseModal from '../components/expenses/ExpenseModal'
@@ -25,15 +26,42 @@ export default function ExpensesPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [expenseToDelete, setExpenseToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [sortBy, setSortBy] = useState('date')
+  const [sortOrder, setSortOrder] = useState('desc')
 
   const filters = {
-    page, limit: 15,
+    page, limit: 10,
     search: debouncedSearch,
     category: category !== 'all' ? category : '',
     startDate, endDate,
   }
 
   const { expenses, total, totalPages, loading, create, update, remove } = useExpenses(filters)
+
+  const sortedExpenses = useMemo(() => {
+    const sorted = [...expenses]
+    if (sortBy === 'date') {
+      sorted.sort((a, b) => {
+        const dateA = new Date(a.date)
+        const dateB = new Date(b.date)
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+      })
+    } else if (sortBy === 'amount') {
+      sorted.sort((a, b) => {
+        return sortOrder === 'asc' ? a.amount - b.amount : b.amount - a.amount
+      })
+    }
+    return sorted
+  }, [expenses, sortBy, sortOrder])
+
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(column)
+      setSortOrder('desc')
+    }
+  }
 
   const handleSearch = useCallback((val) => {
     setSearch(val)
@@ -92,7 +120,7 @@ export default function ExpensesPage() {
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Expenses</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">{total} total records</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           <button onClick={handleExport} className="btn-secondary"><Download size={15} /> Export</button>
           <button onClick={() => { setEditingExpense(null); setModalOpen(true) }} className="btn-primary"><Plus size={15} /> Add Expense</button>
         </div>
@@ -149,14 +177,42 @@ export default function ExpensesPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-800">
-                    {['Expense', 'Category', 'Date', 'Amount', ''].map(h => (
-                      <th key={h} className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${h === 'Amount' ? 'text-right' : 'text-left'}`}>{h}</th>
-                    ))}
+                    <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-left">S.No</th>
+                    <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-left">Expense</th>
+                    <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-left">Category</th>
+                    <th 
+                      onClick={() => handleSort('date')} 
+                      className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-left cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors group"
+                    >
+                      <div className="flex items-center gap-2">
+                        Date
+                        {sortBy === 'date' && (
+                          sortOrder === 'desc' ? <ArrowDown size={14} className="text-sky-500" /> : <ArrowUp size={14} className="text-sky-500" />
+                        )}
+                        {sortBy !== 'date' && <ArrowDown size={14} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-50 transition-opacity" />}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('amount')} 
+                      className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors group"
+                    >
+                      <div className="flex items-center justify-end gap-2">
+                        Amount
+                        {sortBy === 'amount' && (
+                          sortOrder === 'desc' ? <ArrowDown size={14} className="text-sky-500" /> : <ArrowUp size={14} className="text-sky-500" />
+                        )}
+                        {sortBy !== 'amount' && <ArrowDown size={14} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-50 transition-opacity" />}
+                      </div>
+                    </th>
+                    <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-left"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-                  {expenses.map(exp => (
+                  {sortedExpenses.map((exp, index) => (
                     <tr key={exp._id} className="group hover:bg-gray-50/70 dark:hover:bg-gray-800/30 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{index + 1}</span>
+                      </td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0" style={{ backgroundColor: CATEGORY_COLORS[exp.category] + '20' }}>
@@ -203,7 +259,7 @@ export default function ExpensesPage() {
 
             {/* Mobile Cards */}
             <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-800">
-              {expenses.map(exp => (
+              {sortedExpenses.map((exp, index) => (
                 <div key={exp._id} className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ backgroundColor: CATEGORY_COLORS[exp.category] + '20' }}>
                     {CATEGORY_ICONS[exp.category]}
@@ -223,7 +279,7 @@ export default function ExpensesPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-4 justify-start px-5 py-4 border-t border-gray-100 dark:border-gray-800">
                 <p className="text-sm text-gray-400">Page {page} of {totalPages}</p>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-secondary py-1.5 px-3 disabled:opacity-40"><ChevronLeft size={16} /></button>
