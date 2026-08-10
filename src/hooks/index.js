@@ -121,3 +121,62 @@ export function useAnalytics(period = 'month') {
 
   return { data, loading, error, refetch: fetch }
 }
+
+/* ─── useAccounts ─── */
+export function useAccounts() {
+  const [accounts, setAccounts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const fetch = useCallback(async () => {
+    setLoading(true)
+    try {
+      const { data } = await api.get('/accounts')
+      setAccounts(data.accounts || [])
+    } catch (e) {
+      setError(e.response?.data?.message || 'Failed to load accounts')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetch() }, [fetch])
+
+  const create = async (payload) => {
+    try {
+      const { data } = await api.post('/accounts', payload)
+      fetch()
+      toast.success('Account created')
+      return { success: true, account: data.account }
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Failed to create account')
+      return { success: false, error: e.response?.data }
+    }
+  }
+
+  const update = async (id, payload) => {
+    try {
+      const { data } = await api.patch(`/accounts/${id}`, payload)
+      fetch()
+      toast.success('Account updated')
+      return { success: true, account: data.account }
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Failed to update account')
+      return { success: false, error: e.response?.data }
+    }
+  }
+
+  const remove = async (id) => {
+    try {
+      await api.delete(`/accounts/${id}`)
+      fetch()
+      toast.success('Account deleted')
+      return { success: true }
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Failed to delete account')
+      return { success: false }
+    }
+  }
+
+  return { accounts, loading, error, refetch: fetch, create }
+}

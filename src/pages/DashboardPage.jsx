@@ -40,6 +40,7 @@ export default function DashboardPage() {
   const budgetPercent = stats?.budgetLimit
     ? Math.min(100, ((stats.budgetUsed || 0) / stats.budgetLimit) * 100)
     : null
+  const remaining = stats?.budgetLimit != null ? (stats.budgetLimit - (stats.budgetUsed || 0)) : null
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -73,7 +74,34 @@ export default function DashboardPage() {
         <StatCard label="Spent this month" value={formatCurrency(stats?.totalThisMonth || 0)} icon={<Wallet size={18} className="text-emerald-500" />} color="bg-emerald-50 dark:bg-emerald-950/50" />
       </div>
 
-      {/* Budget Progress */}
+      {/* Budget Limit Display */}
+      <div className="mt-2">
+        <div className="card p-4 flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Budget Limit</h4>
+            <p className="text-xs text-gray-400 mt-1">Set your monthly spending cap in Settings</p>
+          </div>
+          <div className="text-right">
+            <div className="text-lg font-semibold text-gray-900 dark:text-white">
+              {stats?.budgetLimit ? (
+                formatCurrency(stats.budgetLimit)
+              ) : (
+                <Link to="/settings" className="text-sky-500 hover:underline">Not set</Link>
+              )}
+            </div>
+            {stats?.budgetLimit && (
+              <div className="text-sm mt-1">
+                {remaining < 0 ? (
+                  <span className="text-sm font-medium text-red-600">Overspent by {formatCurrency(Math.abs(remaining))}</span>
+                ) : (
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Remaining: {formatCurrency(remaining)}</span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+        {/* Budget Progress */}
       {stats?.budgetLimit && (
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
@@ -93,6 +121,36 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Accounts */}
+      <div className="card p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Accounts</h3>
+          <Link to="/accounts" className="text-xs text-sky-500 hover:text-sky-600 flex items-center gap-1 font-medium">Manage <ArrowRight size={12} /></Link>
+        </div>
+        {!stats?.accounts?.length ? (
+          <div className="text-center py-6">
+            <div className="text-lg">No accounts</div>
+            <Link to="/accounts" className="text-xs text-sky-500 hover:underline mt-1 inline-block">Add an account</Link>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {stats.accounts.map(acc => (
+              <div key={acc._id} className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-gray-800 dark:text-gray-200">{acc.name}</div>
+                  <div className="text-xs text-gray-400">{acc.bank ? `${acc.bank} • ` : ''}****{acc.accountNumber?.slice(-4)}</div>
+                </div>
+                <div className="text-sm font-semibold">{formatCurrency(acc.balance || 0)}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+    
+
+      {/* Budget is displayed in the Monthly Budget card above; management is in Settings */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Transactions */}

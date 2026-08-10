@@ -63,6 +63,7 @@ export default function SignupPage() {
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Create account</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Start tracking your expenses</p>
+        <p className="text-xs text-amber-600 dark:text-amber-300 mt-2">Please note: password reset is not available for this account. Store your password safely.</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

@@ -204,6 +204,7 @@ export default function ExpensesPage() {
                         {sortBy !== 'amount' && <ArrowDown size={14} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-50 transition-opacity" />}
                       </div>
                     </th>
+                    <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-left">Account</th>
                     <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-left"></th>
                   </tr>
                 </thead>
@@ -242,6 +243,18 @@ export default function ExpensesPage() {
                         <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{formatCurrency(exp.amount)}</span>
                       </td>
                       <td className="px-5 py-3.5">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {exp.accountId ? (
+                            <div>
+                              <div className="font-medium text-gray-800 dark:text-gray-200">{exp.accountId.name}</div>
+                              <div className="text-xs text-gray-400">{exp.accountId.bank ? `${exp.accountId.bank} • ` : ''}****{exp.accountId.accountNumber?.slice(-4)}</div>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400">No account</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => { setEditingExpense(exp); setModalOpen(true) }} className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                             <Pencil size={14} />
@@ -266,7 +279,7 @@ export default function ExpensesPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{exp.title}</p>
-                    <p className="text-xs text-gray-400">{formatDate(exp.date)} · {exp.category}</p>
+                    <p className="text-xs text-gray-400">{formatDate(exp.date)} · {exp.category}{exp.accountId ? ` · ${exp.accountId.name}` : ''}</p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{formatCurrency(exp.amount)}</span>

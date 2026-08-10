@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage'
 import ExpensesPage from './pages/ExpensesPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import SettingsPage from './pages/SettingsPage'
+import AccountsPage from './pages/AccountsPage'
 import DashboardLayout from './components/layout/DashboardLayout'
 import AuthLayout from './components/layout/AuthLayout'
 import Spinner from './components/ui/Spinner'
@@ -43,6 +44,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/accounts" element={<AccountsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
 

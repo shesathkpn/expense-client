@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -14,10 +14,15 @@ const schema = z.object({
   notes: z.string().max(500).optional(),
   isRecurring: z.boolean().optional(),
   recurringInterval: z.enum(['daily', 'weekly', 'monthly']).optional().nullable(),
+  accountId: z.string().optional().nullable(),
 })
+
+import { useAccounts } from '../../hooks'
 
 export default function ExpenseModal({ open, onClose, onSubmit, expense }) {
   const isEditing = !!expense
+
+  const { accounts, loading: accountsLoading, refetch: refetchAccounts, create: createAccount } = useAccounts()
 
   const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
@@ -41,6 +46,7 @@ export default function ExpenseModal({ open, onClose, onSubmit, expense }) {
           notes: expense.notes || '',
           isRecurring: expense.isRecurring || false,
           recurringInterval: expense.recurringInterval || undefined,
+          accountId: expense.accountId || undefined,
         })
       } else {
         reset({ date: format(new Date(), 'yyyy-MM-dd'), category: 'Food', isRecurring: false })
@@ -114,6 +120,31 @@ export default function ExpenseModal({ open, onClose, onSubmit, expense }) {
             <div>
               <label className="label">Notes <span className="text-gray-400 font-normal">(optional)</span></label>
               <textarea {...register('notes')} rows={2} className="input resize-none" placeholder="Any additional details..." />
+            </div>
+
+            <div>
+              <label className="label">Account <span className="text-gray-400 font-normal">(optional)</span></label>
+              <div className="flex gap-2">
+                <select {...register('accountId')} className="input flex-1">
+                  <option value="">None</option>
+                  {accounts.map(a => (
+                    <option key={a._id} value={a._id}>{a.name} {a.bank ? `— ${a.bank}` : ''} • ****{a.accountNumber?.slice(-4)}</option>
+                  ))}
+                </select>
+                <button type="button" onClick={async () => {
+                  const name = window.prompt('Account name (e.g. My Savings)')
+                  if (!name) return
+                  const bank = window.prompt('Bank name (optional)')
+                  const accountNumber = window.prompt('Account number')
+                  if (!accountNumber) return
+                  const initialBalanceRaw = window.prompt('Initial balance (e.g. 1000.00)')
+                  const initialBalance = initialBalanceRaw ? parseFloat(initialBalanceRaw) : 0
+                  const res = await createAccount({ name, bank, accountNumber, initialBalance })
+                  if (res.success) {
+                    refetchAccounts()
+                  }
+                }} className="btn-secondary">Add</button>
+              </div>
             </div>
 
             <div className="space-y-3">

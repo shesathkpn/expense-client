@@ -16,6 +16,7 @@ const PERIODS = [
   { value: 'day', label: 'Daily (30d)' },
   { value: 'week', label: 'Weekly (12w)' },
   { value: 'month', label: 'Monthly (6m)' },
+  { value: 'year', label: 'Yearly (5y)' },
 ]
 
 function CustomTooltip({ active, payload, label }) {

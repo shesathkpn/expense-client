@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Receipt, BarChart3,
-  Settings, LogOut, TrendingUp, Menu, X, Sun, Moon,
+  Settings, LogOut, TrendingUp, Menu, X, Sun, Moon, CreditCard,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
@@ -11,6 +11,7 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/expenses',  icon: Receipt,         label: 'Expenses'  },
   { to: '/analytics', icon: BarChart3,        label: 'Analytics' },
+  { to: '/accounts',  icon: CreditCard,       label: 'Accounts'  },
   { to: '/settings',  icon: Settings,         label: 'Settings'  },
 ]
 
